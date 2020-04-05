@@ -12,3 +12,8 @@
 If you want to run the software for free, you're more than welcome. Here's the source.
 
 [Donations](https://www.paypal.me/fphilipe) appreciated.
+
+## Update 
+
+- Ability to load user.css file;
+- Note: A domain name still needs to correspond to only one file, that is, you cannot write multiple `@ -moz-documen` in a user.css file.
