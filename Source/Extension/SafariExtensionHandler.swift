@@ -18,7 +18,7 @@ class SafariExtensionHandler: SFSafariExtensionHandler {
             guard let host = $0?.url?.host else { return }
 
             let basenames = fileBasenames(forHost: host)
-
+            
             let keysWithValues = Config.FileType.allCases.map { fileType -> (Type, [Name: Content]) in
                 let files: [Name: Content]
                 if let url = self.localConfig.url(for: fileType) {
@@ -66,12 +66,15 @@ private func fileBasenames(forHost host: String) -> [String] {
 private func loadFiles(from dir: URL, basenames: [String], extension: String) -> [Name: Content] {
     let val = dir.startAccessingSecurityScopedResource()
     defer { dir.stopAccessingSecurityScopedResource() }
-
+    
     let keysWithValues = basenames.compactMap { basename -> (Name, Content)? in
         let fileName = "\(basename).\(`extension`)"
         let url = dir.appendingPathComponent(fileName)
-
-        return try? (fileName, String(contentsOf: url))
+        
+        let usercss = try? String(contentsOf: url)
+        let normalcss = usercss?.replacingOccurrences(of: "@-moz-document\\s*[\\w.]*\\(\"[\\w.]*\"\\)\\s*\\{([\\s\\S]*)(\\})", with: "$1", options: .regularExpression, range: nil)
+        
+        return (fileName, normalcss) as? (Name, Content)
     }
 
     return Dictionary(uniqueKeysWithValues: keysWithValues)
