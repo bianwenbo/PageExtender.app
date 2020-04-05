@@ -68,13 +68,16 @@ private func loadFiles(from dir: URL, basenames: [String], extension: String) ->
     defer { dir.stopAccessingSecurityScopedResource() }
     
     let keysWithValues = basenames.compactMap { basename -> (Name, Content)? in
-        let fileName = "\(basename).\(`extension`)"
+        var fileName = "\(basename).\(`extension`)"
+        if `extension` == "css" {
+            fileName = "\(basename).user.\(`extension`)"
+        }
         let url = dir.appendingPathComponent(fileName)
         
-        let usercss = try? String(contentsOf: url)
-        let normalcss = usercss?.replacingOccurrences(of: "@-moz-document\\s*[\\w.]*\\(\"[\\w.]*\"\\)\\s*\\{([\\s\\S]*)(\\})", with: "$1", options: .regularExpression, range: nil)
+        let userCss = try? String(contentsOf: url)
+        let normalCss = userCss?.replacingOccurrences(of: "@-moz-document\\s*[\\w.]*\\(\"[\\w.]*\"\\)\\s*\\{([\\s\\S]*)(\\})", with: "$1", options: .regularExpression, range: nil)
         
-        return (fileName, normalcss) as? (Name, Content)
+        return (fileName, normalCss) as? (Name, Content)
     }
 
     return Dictionary(uniqueKeysWithValues: keysWithValues)
